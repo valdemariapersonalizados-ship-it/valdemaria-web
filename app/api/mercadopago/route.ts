@@ -13,33 +13,26 @@ export async function POST(req: Request) {
           Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
         },
         body: JSON.stringify({
-          items: body.items,
+          items: [
+            {
+              title: "Compra tienda",
+              quantity: 1,
+              unit_price: Number(body.total || 1000),
+            },
+          ],
           payer: {
-            name: body.name,
+            name: body.nombre,
             email: body.email,
           },
-          external_reference: body.order_number,
-
-          back_urls: {
-            success: "http://localhost:3000/mi-cuenta",
-            failure: "http://localhost:3000/tienda",
-            pending: "http://localhost:3000/mi-cuenta",
-          },
-
-          auto_return: "approved",
+          notification_url: `${body.url}/api/mercadopago/webhook`,
         }),
       }
     );
 
     const data = await response.json();
 
-    return NextResponse.json({
-      init_point: data.init_point,
-    });
+    return NextResponse.json({ init_point: data.init_point });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Error Mercado Pago" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error" }, { status: 500 });
   }
 }
