@@ -1,107 +1,50 @@
 "use client";
 
-import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useMemo, useState } from "react";
+import { Header } from "@/components/layout/header";
+import { createClient } from "@/lib/supabase/browser";
 
 export default function LoginPage() {
-  const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("Ingresa con tu cuenta para acceder a cursos y pedidos.");
 
-  async function handleAuth() {
-    if (!email || !password) {
-      alert("Ingresa correo y contraseña.");
+  const demoMode = useMemo(
+    () => !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    [],
+  );
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (demoMode) {
+      setMessage("Modo demo activo: configura .env.local para login real con Supabase.");
       return;
     }
 
-    if (mode === "register") {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      alert("Cuenta creada. Revisa tu correo si Supabase solicita confirmación.");
-      return;
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      setMessage("Login exitoso. Ya puedes entrar al área privada.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No se pudo iniciar sesión.");
     }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    window.location.href = "/mi-cuenta";
   }
 
   return (
-    <main className="min-h-screen bg-pink-50 p-6 flex items-center justify-center text-slate-900">
-      <section className="w-full max-w-md rounded-3xl bg-white p-8 shadow-xl">
-        <h1 className="text-3xl font-black text-pink-600 text-center">
-          Mi cuenta Valdemaria
-        </h1>
-
-        <p className="mt-2 text-center text-sm text-slate-500">
-          Ingresa para ver tus pedidos, cursos y descargas.
-        </p>
-
-        <div className="mt-6 flex rounded-full bg-pink-50 p-1">
-          <button
-            onClick={() => setMode("login")}
-            className={`flex-1 rounded-full py-2 text-sm font-black ${
-              mode === "login"
-                ? "bg-pink-500 text-white"
-                : "text-pink-500"
-            }`}
-          >
-            Iniciar sesión
-          </button>
-
-          <button
-            onClick={() => setMode("register")}
-            className={`flex-1 rounded-full py-2 text-sm font-black ${
-              mode === "register"
-                ? "bg-pink-500 text-white"
-                : "text-pink-500"
-            }`}
-          >
-            Crear cuenta
-          </button>
-        </div>
-
-        <div className="mt-6 space-y-3">
-          <input
-            type="email"
-            placeholder="Correo electrónico"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-xl border px-4 py-3 text-sm"
-          />
-
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-xl border px-4 py-3 text-sm"
-          />
-
-          <button
-            onClick={handleAuth}
-            className="w-full rounded-full bg-pink-500 px-5 py-3 font-black text-white"
-          >
-            {mode === "login" ? "Entrar" : "Crear cuenta"}
-          </button>
-        </div>
-      </section>
-    </main>
+    <>
+      <Header />
+      <main className="mx-auto flex min-h-[70vh] max-w-md items-center px-6">
+        <form onSubmit={handleLogin} className="glass-card w-full p-6">
+          <h1 className="text-2xl font-bold">Iniciar sesión</h1>
+          <p className="mt-2 text-xs text-neutral-600">{message}</p>
+          {demoMode && <p className="mt-2 rounded bg-amber-100 p-2 text-xs text-amber-800">Estás en modo demo sin Supabase.</p>}
+          <input value={email} onChange={(e) => setEmail(e.target.value)} className="mt-4 w-full rounded border p-2" type="email" placeholder="Correo" />
+          <input value={password} onChange={(e) => setPassword(e.target.value)} className="mt-3 w-full rounded border p-2" type="password" placeholder="Contraseña" />
+          <button className="mt-4 w-full rounded bg-fuchsia-600 py-2 text-white">Entrar</button>
+        </form>
+      </main>
+    </>
   );
 }

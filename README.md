@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Valdemaria Studio Pro
 
-## Getting Started
+Sitio web para Valdemaria Personalizados con Next.js App Router, TypeScript, Tailwind, Supabase y flujo de compra por WhatsApp.
 
-First, run the development server:
+## ✅ Verla funcionando ya (modo demo)
+
+Solo necesitas ejecutar:
 
 ```bash
+npm run setup
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir en navegador: `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> Si todavía no configuras Supabase, la app **igual funciona** en modo demo.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Estado actual
 
-## Learn More
+- Home premium con CTA a tienda y studio.
+- Studio 3D (MVP) con flujo visual + acción de IA mock.
+- Tienda con carrito funcional (persistencia local) + checkout por WhatsApp.
+- Login con fallback demo si no hay variables de Supabase.
+- Panel admin MVP con CRUD local para productos.
 
-To learn more about Next.js, take a look at the following resources:
+## Activar Supabase real (opcional)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Copia `.env.example` a `.env.local` y completa:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SITE_URL`
+- `REMOVE_BG_API_KEY`
 
-## Deploy on Vercel
+Luego:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Crea proyecto en Supabase.
+2. Ejecuta `supabase/schema.sql` en SQL Editor.
+3. Configura Auth email/password.
+4. Crea buckets: `products`, `courses`, `mockups`, `media`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy en Vercel
+
+1. Sube la rama a GitHub.
+2. Importa el proyecto en Vercel.
+3. Agrega variables de entorno.
+4. Deploy.
